@@ -1,35 +1,40 @@
-import React, { useCallback, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { FiUpload } from 'react-icons/fi'
-import "./style.css"
+import axios from 'axios'
+import React, { useState } from 'react'
 
-export default function MyDropzone() {
+export default function Recebe() {
 
-    const [selectedFile, setSelectedFile] = useState('')
+    const [image, setImage] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    const onDrop = useCallback(acceptedFiles => {
-        const file = acceptedFiles[0]
-        const fileUrl = URL.createObjectURL(file)
+    const uploadImage = async e => {
+        const files = e.target.files
+        const data = new FormData()
+        data.append('file', files[0])
+        data.append('upçoad_preset', 'darwin')
+        setLoading(true)
+        const res = await axios.post('http://localhost:3000/', {
+            imagem: data
+        })
+        
+        setImage(data)
+        setLoading(false)
+    }
 
-        setSelectedFile(fileUrl)
-    }, [])
-    const { getRootProps, getInputProps } = useDropzone({ onDrop })
-
-    return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {selectedFile
-                ? <img
-                    src={selectedFile}
-                    alt="img"
-                    className="img"
-                />
-                : <p>
-                    <FiUpload />
-                    <br />
-                    Insira uma Imagem aqui!
-                </p>
-            }
-        </div>
-    )
+  return (
+    <div>
+        <h1>Upload Imagem</h1>
+        <br />
+        <input 
+            type="file" 
+            name="file"
+            placeholder="Upload Imagem"
+            onChange={uploadImage}
+        />
+        <br /><br />
+        {loading ? 
+            (<h1>Loading...</h1>) :
+            (<img src={image} alt="Eesperando imagem" className="col-12" />)
+        }
+    </div>
+  )
 }
